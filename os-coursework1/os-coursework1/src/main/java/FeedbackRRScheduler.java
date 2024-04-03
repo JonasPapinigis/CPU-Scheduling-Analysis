@@ -1,4 +1,4 @@
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Feedback Round Robin Scheduler
@@ -7,13 +7,14 @@ import java.util.Properties;
  */
 public class FeedbackRRScheduler extends AbstractScheduler {
 
-  // TODO
+  int timeQuantum;
+  Queue<Process> readyQueue;
 
-  /**
-   * Adds a process to the ready queue.
-   * usedFullTimeQuantum is true if process is being moved to ready
-   * after having fully used its time quantum.
-   */
+  @Override
+  public void initialize(Properties parameters) {
+
+  }
+
   public void ready(Process process, boolean usedFullTimeQuantum) {
 
     // TODO

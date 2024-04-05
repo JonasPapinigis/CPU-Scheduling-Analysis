@@ -49,7 +49,7 @@ public class FeedbackRRScheduler extends AbstractScheduler {
     return null; // No process to run
   }
 
-  public void initialise(Properties p){
+  public void initialize(Properties p){
     timeQuantum = Integer.parseInt(p.getProperty("timeQuantum"));
   }
 

@@ -14,6 +14,7 @@ import java.io.IOException;
  */
 public class Simulator
 {
+
   /**
    * Prints a usage message
    */

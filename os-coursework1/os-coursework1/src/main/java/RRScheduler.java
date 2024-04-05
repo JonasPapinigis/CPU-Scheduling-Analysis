@@ -10,7 +10,8 @@ public class RRScheduler extends AbstractScheduler {
   int timeQuantum;
   Queue<Process> readyQueue;
 
-  public void initialise(Properties properties){
+  @Override
+  public void initialize(Properties properties){
     timeQuantum = Integer.parseInt(properties.getProperty("timeQuantum"));
   }
 

@@ -20,9 +20,7 @@ public class IdealSJFScheduler extends AbstractScheduler {
    * after having fully used its time quantum.
    */
   public void ready(Process process, boolean usedFullTimeQuantum) {
-
     readyQueue.offer(process);
-
   }
 
   /**

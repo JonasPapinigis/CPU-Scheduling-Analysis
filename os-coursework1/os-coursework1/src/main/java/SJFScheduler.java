@@ -24,14 +24,13 @@ public class SJFScheduler extends AbstractScheduler {
    */
   public void ready(Process process, boolean usedFullTimeQuantum) {
     double estBurstValue;
-    System.out.println("Enqueueing "+ process.getId()+" with est. burst ");
+
     if (process.getRecentBurst() == -1) {
       estBurstValue = initialBurstEstimate;
     } else {
       Double previousEstimate = priorityMap.getOrDefault(process, initialBurstEstimate);
       estBurstValue = alphaBurstEstimate * process.getRecentBurst() + (1 - alphaBurstEstimate) * previousEstimate;
     }
-
     priorityMap.put(process, estBurstValue);
     readyQueue.add(process);
   }

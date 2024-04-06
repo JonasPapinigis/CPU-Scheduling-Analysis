@@ -67,7 +67,11 @@ def create_experiment(init_values, to_test, test_values, trial_name):
     all_schedulers = ["FcfsScheduler", "IdealSJFScheduler", "RRScheduler", "FeedbackRRScheduler", "SJFScheduler"]
     
     # Determine which schedulers to test
-    schedulers_to_test = init_values[0] if init_values[0] else all_schedulers
+    mask = init_values[0]
+    if mask:
+        schedulers_to_test = [scheduler for scheduler, to_include in zip(all_schedulers, mask) if to_include]
+    else:
+        schedulers_to_test = all_schedulers
     
     inputs_folder_name = os.path.join(base_folder_name, trial_name)
     os.makedirs(inputs_folder_name, exist_ok=True)
@@ -89,10 +93,10 @@ def create_experiment(init_values, to_test, test_values, trial_name):
             file_name = f"{scheduler_short_name}{num}"
             create_input_file(_input_data, file_name, inputs_folder_name)
 
-_init_values = ["", 10000, False, 0, 20, 10.0, 0.5]  
+_init_values = [[True,True,False,False,False], 10000, False, 0, 20, 10.0, 0.5]  
 _to_test = 4  
 _test_values = [10, 20, 30, 40]  
-_trial_name = "QuantumVariation"
+_trial_name = "beta"
 create_experiment(_init_values, _to_test, _test_values, _trial_name)
 
 

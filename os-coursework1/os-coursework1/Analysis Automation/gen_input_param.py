@@ -1,5 +1,4 @@
 import numpy as np
-from dataclasses import dataclass
 import os
 from typing import Any
 
@@ -14,6 +13,7 @@ meanNumberBursts=2.0
 seed=270826029269605
 """
 
+#InputData class ensures the presence of all values in read parameters
 class InputData:
     def __init__(self, num_proc: int, static_prior: int, mean_arrival: int, 
                  mean_cpu: float, mean_io: float, mean_num_burst: float, seed: int):
@@ -49,7 +49,7 @@ class InputData:
                 self._mean_cpu, self._mean_io, self._mean_num_burst, self._seed]
         
         
-def create_input_file(input_data, name: str, loc=None):
+def create_input_parameters(input_data, name: str, loc=None):
     folder_name = loc if loc is not None else 'Data'
     
     os.makedirs(folder_name, exist_ok=True)
@@ -64,7 +64,7 @@ def create_input_file(input_data, name: str, loc=None):
         file.write(contents)
 
 def create_experiment(init_values, to_test, test_values, trial_name):
-    base_folder_name = 'Data/Inputs'
+    base_folder_name = 'Data/Input_Parameters'
     inputs_folder_name = os.path.join(base_folder_name, trial_name)
 
     os.makedirs(inputs_folder_name, exist_ok=True)
@@ -73,7 +73,7 @@ def create_experiment(init_values, to_test, test_values, trial_name):
         values = init_values.copy()  # Create a copy to avoid mutation
         values[to_test] = value
         _input_data = InputData(*values)
-        create_input_file(_input_data, f"inpt{num}", inputs_folder_name)
+        create_input_parameters(_input_data, f"inpt{num}", inputs_folder_name)
 
 
 

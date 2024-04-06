@@ -62,7 +62,7 @@ def create_input_file(input_data, name: str, loc=None):
         file.write(contents)
 
 def create_experiment(init_values, to_test, test_values, trial_name):
-    base_folder_name = 'Data/Parameters'
+    base_folder_name = 'Data/Scheduler_Parameters'
     # Define all possible schedulers
     all_schedulers = ["FcfsScheduler", "IdealSJFScheduler", "RRScheduler", "FeedbackRRScheduler", "SJFScheduler"]
     
@@ -72,27 +72,26 @@ def create_experiment(init_values, to_test, test_values, trial_name):
     inputs_folder_name = os.path.join(base_folder_name, trial_name)
     os.makedirs(inputs_folder_name, exist_ok=True)
     
-    # Iterate through each specified scheduler
+    
     for scheduler in schedulers_to_test:
-        scheduler_short_name = scheduler.replace("Scheduler", "")  # Simplify the scheduler name
-        # Iterate through each test value for the parameter
+        scheduler_short_name = scheduler.replace("Scheduler", "")  
+        
         for num, value in enumerate(test_values):
-            values = init_values[1:].copy()  # Skip the first value which is for schedulers
-            # Adjust the specified parameter with the current test value
-            if to_test > 0:  # Ensure to_test is within valid range
-                # Insert scheduler at the beginning of the values list
+            values = init_values[1:].copy()  
+            
+            if to_test > 0:  
+                
                 values.insert(0, scheduler)
-                # Adjust the test parameter
+                
                 values[to_test] = value
             _input_data = SchedulerParams(*values)
-            # Format file name as [schedulerShortName][num]
+            
             file_name = f"{scheduler_short_name}{num}"
             create_input_file(_input_data, file_name, inputs_folder_name)
 
-# Example usage
-_init_values = ["", 10000, False, 0, 20, 10.0, 0.5]  # Empty string for all schedulers
-_to_test = 4  # Index for the parameter to test
-_test_values = [10, 20, 30, 40]  # Different values for the test parameter
+_init_values = ["", 10000, False, 0, 20, 10.0, 0.5]  
+_to_test = 4  
+_test_values = [10, 20, 30, 40]  
 _trial_name = "QuantumVariation"
 create_experiment(_init_values, _to_test, _test_values, _trial_name)
 

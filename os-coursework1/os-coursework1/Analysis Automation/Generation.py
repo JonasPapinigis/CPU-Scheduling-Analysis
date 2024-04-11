@@ -263,8 +263,8 @@ _test_name = "experiment2"
 create_experiment(example_params,_to_test,_test_values,_test_name)
 
 generate_inputs("experiment2")
-_init_values = [[True,True,False,False,False], 10000, False, 0, 20, 10.0, 0.5]  
-_to_test = 4  
+_init_values = [[True,True,True,True,False], 10000, False, 0, 20, 10.0, 0.5]  
+_to_test = 4
 _test_values = [10, 20, 30, 40]  
 _trial_name = "experiment2"
 

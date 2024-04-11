@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib as plt
 from io import BufferedReader
+import os
 
 #id	priority	createdTime	startedTime	terminatedTime	cpuTime	blockedTime	turnaroundTime	waitingTime	responseTime
 
@@ -21,4 +22,27 @@ def convert_doc(output_doc):
 
     return processes
 
-print(convert_doc(r"Data\Outputs\beta\Fcfs0inpt1.in"))
+def aggregate_data(experiment):
+    scheduler_types = ["Fcfs","IdealSJF", "FeedbackRR","RR","SJFS"]
+    outputs = []
+    #Need this to be (Type, Data)
+    output_paths = [f"{experiment}/{f}" for f in os.listdir(experiment) if f.endswith(".out")]
+    print(len(output_paths))
+    for path in output_paths:
+        scheduler = "ERROR"
+        #Want this to be in order so RR check comes after FeedbackRR, as it is its subsrtring
+        for type in scheduler_types:
+            if type in path:
+                scheduler = type
+                print(scheduler)
+                break
+                
+        outputs.append((scheduler,convert_doc(path)))
+    return outputs
+    
+        
+
+
+
+    
+print(aggregate_data("experiment2"))

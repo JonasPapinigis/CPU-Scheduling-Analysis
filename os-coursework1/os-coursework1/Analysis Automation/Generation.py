@@ -96,7 +96,7 @@ def create_experiment(init_values, to_test, test_values, trial_name):
 #run = subprocess.run(['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'InputGenerator','experiment1/input_parameters.prp','experiment1/inputs.in'],stdout=True,stdin=True)
 
 def generate_inputs(trial_name):
-
+    cmds = ""
     if not os.path.exists(trial_name) or not os.path.isdir(trial_name):
         raise ValueError("Input Folder Not found")
 
@@ -105,7 +105,12 @@ def generate_inputs(trial_name):
     for file in input_files:
         base_name = os.path.basename(file).replace(".prp","")
         output_destination = os.path.join(trial_name,base_name) + ".in"
-        subprocess.run(['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'InputGenerator', file, output_destination])
+        args = ['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'InputGenerator', file, output_destination]
+        subprocess.run(args)
+        cmds += " ".join(args)+"\n"
+    cmds += "\n"
+    return cmds
+        
 
 
 
@@ -222,7 +227,7 @@ def create_schedulers(init_values, to_test, test_values, trial_name):
 #run = subprocess.run(['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'InputGenerator','experiment1/input_parameters.prp','experiment1/inputs.in'],stdout=True,stdin=True)
 
 def generate_outputs(trial_name):
-
+    cmds = ""
 
     #print(f"Input,Scheduler,Output Directories:\n{input_path}\n{scheduler_path}\n{output_path}")
 
@@ -232,7 +237,6 @@ def generate_outputs(trial_name):
     input_files = [f for f in os.listdir(trial_name) if f.endswith(".in")]
     
     schedulers = [f for f in os.listdir(trial_name) if f.endswith("_.prp")]
-    print(input_files,schedulers)
 
     for scheduler in schedulers: 
         for input in input_files:
@@ -242,8 +246,11 @@ def generate_outputs(trial_name):
             output_filename = scheduler_base.replace("_.prp","")+input_base.replace(".in","")+".out"
             final_output = os.path.join(trial_name,output_filename).replace("\\","/")
             
-            print(f"Final Name:{final_output}")
-            subprocess.run(['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'Simulator', f"{trial_name}/{scheduler}", final_output, f"{trial_name}/{input}"])
+            args = ['cmd', '/c', 'java','-cp', 'target/os-coursework1-1.0-SNAPSHOT.jar', 'Simulator', f"{trial_name}/{scheduler}", final_output, f"{trial_name}/{input}"]
+            subprocess.run(args)
+            cmds += " ".join(args)+"\n"
+    cmds += "\n"
+    return cmds
 
 
 
@@ -254,20 +261,39 @@ def generate_outputs(trial_name):
 
 
 
-    
-
+experiment_name = "experiment2"
+commands = ""
 example_params = [4,0,50,15.0,15.0,2.0,270826029269605]
 _to_test = 2
-_test_values = [10,20,40,80,160]
-_test_name = "experiment2"
+_test_values = [10,20]
+_test_name = experiment_name
 create_experiment(example_params,_to_test,_test_values,_test_name)
 
-generate_inputs("experiment2")
-_init_values = [[True,True,True,True,False], 10000, False, 0, 20, 10.0, 0.5]  
+commands += generate_inputs(experiment_name)
+_init_values = [[False,True,False,False,False], 10000, False, 0, 20, 10.0, 0.5]  
 _to_test = 4
-_test_values = [10, 20, 30, 40]  
-_trial_name = "experiment2"
+_test_values = [10]  
+_trial_name = experiment_name
 
 create_schedulers(_init_values, _to_test, _test_values, _trial_name)
 
-generate_outputs('experiment2')
+commands += generate_outputs(experiment_name)
+
+
+if (os.path.isfile("run.bat")):
+    with open("run.bat",'r') as file:
+        lines = file.readlines()
+        if lines and lines[-1].strip().lower() == 'pause':
+            lines = lines[:-1]
+    
+    lines.append(commands + '\n')
+    lines.append('pause\n')
+
+    with open("run.bat", 'w') as file:
+        file.writelines(lines)
+    
+
+else :
+    
+    with open("run.bat","w") as file:
+        file.write(f"@echo off\n Automated Experiment Recreation\n {commands}\n pause")

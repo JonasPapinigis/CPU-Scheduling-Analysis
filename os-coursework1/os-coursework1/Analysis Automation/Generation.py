@@ -2,9 +2,7 @@ import numpy as np
 import subprocess
 import os
 from typing import Any
-
-
-
+import itertools
 
 
 
@@ -22,42 +20,7 @@ meanNumberBursts=2.0
 seed=270826029269605
 """
 
-#InputData class ensures the presence of all values in read parameters
-class InputData:
-    def __init__(self, num_proc: int, static_prior: int, mean_arrival: int, 
-                 mean_cpu: float, mean_io: float, mean_num_burst: float, seed: int):
-        
-        if any(arg is None for arg in [num_proc, static_prior, mean_arrival, mean_cpu, mean_io, mean_num_burst]):
-            raise ValueError("None value is not allowed for any parameter")
-        self._num_proc = num_proc
-        self._static_prior = static_prior
-        self._mean_arrival = mean_arrival
-        self._mean_cpu = mean_cpu
-        self._mean_io = mean_io
-        self._mean_num_burst = mean_num_burst
-        if seed == None:
-            self._seed = np.random.Generator.integers(100000000000000000,999999999999999999)
-        else: 
-            self._seed = seed
-
-    
-
-    def to_dict(self):
-        return {
-            'numberOfProcesses': self._num_proc,
-            'staticPriority': self._static_prior,
-            'meanInterArrival': self._mean_arrival,
-            'meanCpuBurst': self._mean_cpu,
-            'meanIOBurst': self._mean_io,
-            'meanNumberBursts': self._mean_num_burst,
-            'seed': self._seed
-        }
-
-    def to_list(self):
-        return [self._num_proc, self._static_prior, self._mean_arrival, 
-                self._mean_cpu, self._mean_io, self._mean_num_burst, self._seed]
-        
-        
+      
 def create_input_parameters(input_data, name: str, loc=None):
     folder_name = loc if loc is not None else 'Data'
     
@@ -66,21 +29,60 @@ def create_input_parameters(input_data, name: str, loc=None):
     file_path = os.path.join(folder_name, name + ".prp")
     
     contents = ""
-    for field_name, value in input_data.to_dict().items():  # Fixed iteration
+    for field_name, value in input_data:  # Fixed iteration
         contents += f"{field_name}={value}\n"
     
     with open(file_path, 'w') as file:
         file.write(contents)
 
+
+def list_to_dict(values):
+
+    keys = [
+        "numberOfProcesses",
+        "staticPriority",
+        "meanInterArrival",
+        "meanCpuBurst",
+        "meanIOBurst",
+        "meanNumberBursts",
+        "seed"
+    ]
+    
+    result_dict = {key: value for key, value in zip(keys, values)}
+    
+    return result_dict
 def create_experiment(init_values, to_test, test_values, trial_name):
+    keys = [
+        "numberOfProcesses",
+        "staticPriority",
+        "meanInterArrival",
+        "meanCpuBurst",
+        "meanIOBurst",
+        "meanNumberBursts",
+        "seed"
+    ]
+    #Allow tuples and single ints
+    if isinstance(to_test, int):
+        to_test = (to_test,)  
+        test_values = [(value,) for value in test_values]
+    
+    #Check that to_test in same format as test_values
+    test_dimensions = len(to_test)
+    for tuple in test_values:
+        if len(tuple) != test_dimensions:
+            raise ValueError("Test values do not match test dimensions")
 
     os.makedirs(trial_name, exist_ok=True)
 
-    for num, value in enumerate(test_values):
+    for num,tuple in enumerate(test_values):
         values = init_values.copy()  # Create a copy to avoid mutation
-        values[to_test] = value
-        _input_data = InputData(*values)
-        create_input_parameters(_input_data, f"inpt{num}", trial_name)
+        #cycles to test parameters
+        for test_ptr,param in enumerate(to_test):
+            #changes that parameter to the value supplied by the test_values
+            values[param] = tuple[test_ptr]
+        
+
+        create_input_parameters(zip(keys,values), f"inpt{num}", trial_name)
 
 
 
@@ -122,15 +124,7 @@ def generate_inputs(trial_name):
 
 
 
-"""
-scheduler=SJFScheduler
-timeLimit=10000
-periodic=false
-interruptTime=0
-timeQuantum=20
-initialBurstEstimate=10
-alphaBurstEstimate=0.5
-"""
+
 
 
 class SchedulerParams:
@@ -261,16 +255,35 @@ def generate_outputs(trial_name):
 
 
 
-experiment_name = "experiment2"
+experiment_name = "experiment1"
 commands = ""
+"""numberOfProcesses
+staticPriority
+meanInterArrival
+meanCpuBurst=15.0
+meanIOBurst=15.0
+meanNumberBursts=2.0
+seed=270826029269605
+"""
 example_params = [4,0,50,15.0,15.0,2.0,270826029269605]
-_to_test = 2
-_test_values = [10,20]
+_to_test = [3,4]
+_test_values = list(itertools.product([1,2,4,8,16,32,64,128], repeat=2))
 _test_name = experiment_name
 create_experiment(example_params,_to_test,_test_values,_test_name)
 
+
+"""
+scheduler=SJFScheduler
+timeLimit=10000
+periodic=false
+interruptTime=0
+timeQuantum=20
+initialBurstEstimate=10
+alphaBurstEstimate=0.5
+"""
+
 commands += generate_inputs(experiment_name)
-_init_values = [[False,True,False,False,False], 10000, False, 0, 20, 10.0, 0.5]  
+_init_values = [[True,True,True,True,True], 10000, False, 0, 20, 10.0, 0.5]  
 _to_test = 4
 _test_values = [10]  
 _trial_name = experiment_name

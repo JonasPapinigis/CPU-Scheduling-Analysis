@@ -1,6 +1,0 @@
-id	priority	createdTime	startedTime	terminatedTime	cpuTime	blockedTime	turnaroundTime	waitingTime	responseTime
-1	0	0	0	23	16	7	23	14	0
-2	0	34	34	73	19	20	39	40	0
-3	0	75	75	124	37	12	49	24	0
-4	0	162	162	163	1	0	1	0	0
-0	0	0	0	163	90	0	163	73	0

@@ -1,0 +1,6 @@
+id	priority	createdTime	startedTime	terminatedTime	cpuTime	blockedTime	turnaroundTime	waitingTime	responseTime
+4	0	162	229	239	10	0	77	67	67
+1	0	0	0	345	199	8	345	154	0
+3	0	75	222	839	499	15	764	280	147
+2	0	34	91	962	254	25	928	699	57
+0	0	0	0	962	0	0	962	962	0

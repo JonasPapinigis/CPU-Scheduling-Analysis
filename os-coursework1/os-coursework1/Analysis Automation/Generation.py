@@ -20,7 +20,7 @@ meanNumberBursts=2.0
 seed=270826029269605
 """
 
-      
+"""
 def create_input_parameters(input_data, name: str, loc=None):
     folder_name = loc if loc is not None else 'Data'
     
@@ -61,28 +61,40 @@ def create_experiment(init_values, to_test, test_values, trial_name):
         "meanNumberBursts",
         "seed"
     ]
+    0
     #Allow tuples and single ints
-    if isinstance(to_test, int):
-        to_test = (to_test,)  
-        test_values = [(value,) for value in test_values]
+    #Typecheck
+    _type = type(to_test)
+    for i in test_values:
+        if type(i) != _type:
+            raise ValueError(f"Ivalid Test Values {i}, {_type}")
     
-    #Check that to_test in same format as test_values
-    test_dimensions = len(to_test)
-    for tuple in test_values:
-        if len(tuple) != test_dimensions:
-            raise ValueError("Test values do not match test dimensions")
+    if _type == "tuple":
+        #Check that to_test in same format as test_values
+        test_dimensions = len(to_test)
+        for tuple in test_values:
+            if len(tuple) != test_dimensions:
+                raise ValueError("Test values do not match test dimensions")
 
     os.makedirs(trial_name, exist_ok=True)
+    if _type == "tuple":
+        for num,tuple in enumerate(test_values):
+            values = init_values.copy()  # Create a copy to avoid mutation
+            #cycles to test parameters
+            for test_ptr,param in enumerate(to_test):
+                #changes that parameter to the value supplied by the test_values
+                values[param] = tuple[test_ptr]
+                create_input_parameters(zip(keys,values), f"inpt{num}", trial_name)
+    else: 
+        for num, value in enumerate(test_values):
+            values = init_values.copy()  # Create a copy to avoid mutation
+            values[to_test] = value  # Set the parameter at index `to_test` to the current test value
 
-    for num,tuple in enumerate(test_values):
-        values = init_values.copy()  # Create a copy to avoid mutation
-        #cycles to test parameters
-        for test_ptr,param in enumerate(to_test):
-            #changes that parameter to the value supplied by the test_values
-            values[param] = tuple[test_ptr]
+            # Assuming create_input_parameters function exists and works as expected
+            create_input_parameters(zip(keys, values), f"inpt{num}", trial_name)
         
-
-        create_input_parameters(zip(keys,values), f"inpt{num}", trial_name)
+"""
+        
 
 
 
@@ -182,7 +194,6 @@ def create_schedulers(init_values, to_test, test_values, trial_name):
     
     # Determine which schedulers to test
     mask = init_values[0]
-    print(init_values)
     if mask:
         schedulers_to_test = [scheduler for scheduler, to_include in zip(all_schedulers, mask) if to_include]
     else:
@@ -255,22 +266,22 @@ def generate_outputs(trial_name):
 
 
 
-experiment_name = "experiment1"
+experiment_name = "experiment3"
 commands = ""
 """numberOfProcesses
 staticPriority
 meanInterArrival
 meanCpuBurst=15.0
 meanIOBurst=15.0
-meanNumberBursts=2.0
+meanNumberBursts=3.0
 seed=270826029269605
-"""
-example_params = [4,0,50,15.0,15.0,2.0,270826029269605]
-_to_test = [3,4]
-_test_values = list(itertools.product([1,2,4,8,16,32,64,128], repeat=2))
+
+example_params = [16,0,200,60.0,60.0,8.0,270826029269605]
+_to_test = 0
+_test_values = [16,16,16,16,16,16,16,16,16,16]
 _test_name = experiment_name
 create_experiment(example_params,_to_test,_test_values,_test_name)
-
+"""
 
 """
 scheduler=SJFScheduler
@@ -284,8 +295,8 @@ alphaBurstEstimate=0.5
 
 commands += generate_inputs(experiment_name)
 _init_values = [[True,True,True,True,True], 10000, False, 0, 20, 10.0, 0.5]  
-_to_test = 4
-_test_values = [10]  
+_to_test = 1
+_test_values = [10000]  
 _trial_name = experiment_name
 
 create_schedulers(_init_values, _to_test, _test_values, _trial_name)

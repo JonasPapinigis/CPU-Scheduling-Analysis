@@ -1,0 +1,7 @@
+scheduler=SJFScheduler
+timeLimit=10000
+periodic=False
+interruptTime=50
+timeQuantum=20
+initialBurstEstimate=10.0
+alphaBurstEstimate=0.5

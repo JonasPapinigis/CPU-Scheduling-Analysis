@@ -1,0 +1,7 @@
+scheduler=IdealSJFScheduler
+timeLimit=10000
+periodic=False
+interruptTime=44
+timeQuantum=20
+initialBurstEstimate=10.0
+alphaBurstEstimate=0.5
